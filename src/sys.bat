@@ -11,6 +11,7 @@ if "%1"=="/sl" goto sleep
 if "%1"=="/e" goto explorer
 if "%1"=="/downloads" goto downloads
 if "%1"=="/w" goto web
+if "%1"=="/h" goto help
 goto void
 
 :shutdown
