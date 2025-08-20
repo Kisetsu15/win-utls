@@ -30,12 +30,12 @@ timeout /t %timer%
 goto void
 
 :explorer REM Open Windows Explorer
-explorer "%2"
+if "%2"=="" set dir="."
+if "%2"=="home" set dir=""
+explorer %dir%
 goto void
 
 :downloads REM Open Downloads Folder
-explorer "%USERPROFILE%\Downloads"
-goto void
 
 :help REM Show Help options
 echo /s [timer]     Shutdown
