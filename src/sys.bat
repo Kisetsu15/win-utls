@@ -1,75 +1,82 @@
 @echo off
+setlocal
 
-if not "%1"=="" goto commnad_executor
-else goto help
+if "%~1"=="" goto help
 
-:: Check parameter and jump to the corresponding label
-:commnad_executor 
-if "%1"=="/s" goto shutdown
-if "%1"=="/r" goto restart
-if "%1"=="/b" goto bios
-if "%1"=="/sl" goto sleep
-if "%1"=="/e" goto explorer
-if "%1"=="/downloads" goto downloads
-if "%1"=="/w" goto web
-if "%1"=="/h" goto help
-goto void
+:: Dispatcher
+if "%~1"=="/s"  goto shutdown
+if "%~1"=="/r"  goto restart
+if "%~1"=="/b"  goto bios
+if "%~1"=="/sl" goto sleep
+if "%~1"=="/e"  goto explorer
+if "%~1"=="/downloads" goto downloads
+if "%~1"=="/w"  goto web
+if "%~1"=="/h"  goto help
+goto invalid
 
 :: Shutdown with optional timer (default 0)
-:shutdown 
-set /a timer=0
-if not "%2"=="" set /a timer=%2
+:shutdown
+set "timer=0"
+if not "%~2"=="" set "timer=%~2"
 shutdown /s /f /t %timer%
-goto void
+goto :eof
 
 :: Restart immediately
-:restart 
+:restart
 shutdown /r /f /t 0
-goto void
+goto :eof
 
 :: Restart into BIOS
-:bios 
+:bios
 shutdown /r /fw /f /t 0
-goto void
+goto :eof
 
-:: Sleep for given seconds or default to 5
-:sleep 
-set /a timer=5
-if not "%2"=="" set /a timer=%2
+:: Sleep (just delays console, doesn’t really sleep PC)
+:sleep
+set "timer=5"
+if not "%~2"=="" set "timer=%~2"
 timeout /t %timer%
-goto void
+goto :eof
 
-:: Open Windows Explorer
-:explorer 
-if "%1"=="" set dir="."
-if "%2"=="home" set dir=""
-explorer %dir%
-goto void
+:: Open Explorer
+:explorer
+set "dir=%~2"
+if "%dir%"=="" set "dir=."
+if /i "%dir%"=="home" set "dir=%USERPROFILE%"
+explorer "%dir%"
+goto :eof
 
-:: Open Downloads Folder
-:downloads 
+:: Open Downloads folder
+:downloads
 explorer "%USERPROFILE%\Downloads"
-goto void
+goto :eof
 
-:: Show Help options
-:help 
-echo /s [timer]     Shutdown
-echo /r             Restart
-echo /b             BIOS
-echo /sl [timer]    Sleep
-echo /e  [address]  Explorer
-echo /downloads     Downloads
-echo /w <url> 	    Website
-goto void
-
-:: Open Specified Website
+:: Open Website
 :web
-if "%2"=="" (
-  echo fatal: Url not specified
-  goto void
+if "%~2"=="" (
+  echo fatal: URL not specified
+  goto :eof
 )
-start "" "https://%2"
-goto void
+start "" "%~2"
+goto :eof
 
-:: End of script label
-:void
+:: Help
+:help
+echo.
+echo Usage:
+echo   /s [timer]      Shutdown (default 0 sec)
+echo   /r              Restart
+echo   /b              Restart into BIOS
+echo   /sl [seconds]   Sleep (console delay)
+echo   /e [dir|home]   Open Explorer
+echo   /downloads      Open Downloads folder
+echo   /w <url>        Open Website
+echo   /h              Show this help
+goto :eof
+
+:: Invalid command
+:invalid
+echo Unknown command: %~1
+echo Use /h for help.
+goto :eof
+
