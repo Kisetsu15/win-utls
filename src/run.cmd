@@ -1,7 +1,8 @@
 @echo off
-set RUN_DIR=%APPDATA%\Local\Run
+set RUN_DIR=%APPDATA%\Run
 
 :Dispatcher
+if /i "%~1"=="init" goto Init
 if "%1"=="add" goto Add
 if "%1"=="list" goto List
 if "%1"=="remove" goto Remove
@@ -16,6 +17,7 @@ set path=%3
 set filePath=%RUN_DIR%\%name%.cmd
 
 if "%name%"=="" set /p name=StartupItem Name: 
+if /i "%~1"=="init" goto init
 if "%path%"=="" set /p path=Path to Executable/URL: 
 
 call :IsEmpty "%name%" "Name"
@@ -68,20 +70,19 @@ if /i "%confirm%"=="y" (
 )
 goto :eof
 
+:Init
+call :DirectoryCheck
+SETX PATH "%PATH%;%RUNDIR%" /M
+goto :eof
+
 :Help
-echo Usage: run.cmd [command] [arguments]
-echo.
-echo Commands:
-echo   add [name] [path]    - Add a new startup item.
-echo   list                 - List all startup items.
-echo   remove|rm [name]     - Remove a startup item by name.
-echo   clear                - Remove all startup items.
-echo   /?                   - Show this help message.
+help/run_help.cmd
 goto :eof
 
 :DirectoryCheck
 if not exist %RUN_DIR% (
     mkdir %RUN_DIR%
+    echo "Run directory created!!"
 )
 exit /b
 
